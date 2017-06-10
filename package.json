@@ -1,0 +1,26 @@
+{
+  "name": "mobx-deep-observer",
+  "version": "0.0.1",
+  "description": "A deep observer for MobX.",
+  "main": "index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dagatsoin/mobx-deep-observer.git"
+  },
+  "keywords": [
+    "mobx",
+    "observable",
+    "observer",
+    "deep"
+  ],
+  "author": "Daniel Neveux",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dagatsoin/mobx-deep-observer/issues"
+  },
+  "homepage": "https://github.com/dagatsoin/mobx-deep-observer#readme"
+}

@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": true,
+        "declaration": true,
+        "module": "commonjs",
+        "removeComments": false,
+        "outDir": "lib/",
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "strictNullChecks": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true
+    },
+    "files": [
+        "src/index.ts"
+    ]
+}
