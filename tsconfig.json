@@ -1,5 +1,4 @@
 {
-    "version": "2.0.0",
     "compilerOptions": {
         "target": "es5",
         "sourceMap": true,
@@ -13,9 +12,10 @@
         "strictNullChecks": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
-        "noImplicitThis": true
+        "noImplicitThis": true,
+        "lib": ["es2017"]
     },
     "files": [
-        "src/index.ts"
+        "src/**/*.ts"
     ]
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "test": "test"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,19 @@
   "bugs": {
     "url": "https://github.com/dagatsoin/mobx-deep-observer/issues"
   },
-  "homepage": "https://github.com/dagatsoin/mobx-deep-observer#readme"
+  "homepage": "https://github.com/dagatsoin/mobx-deep-observer#readme",
+  "peerDependencies": {
+    "mobx": "^3.1.14"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.29",
+    "chai": "^4.0.2",
+    "mobx": "^3.1.14",
+    "mocha": "^3.4.2",
+    "reflect-metadata": "^0.1.10",
+    "ts-node": "^3.0.6",
+    "typescript": "^2.3.4"
+  }
 }

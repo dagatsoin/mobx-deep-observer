@@ -1,0 +1,4 @@
+--require ts-node/register
+--debug
+-R spec
+/Users/fraktar/dev/mobx-deep-observer/test/index.spec.ts
