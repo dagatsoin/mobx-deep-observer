@@ -1,15 +1,17 @@
 import {should, expect} from "chai";
-import {observable, ObservableMap} from "mobx";
+import {computed, observable, ObservableMap} from "mobx";
 import "reflect-metadata";
-import {DeepObserver, getObservableType} from "../src/index";
+import {deepObserve, DeepObserver, getObservableType} from "../src/index";
+
+// Objects for decorator tests
 
 class User {
 
     @observable
-    username: string = "Fraktar";
+    private aura: number = 0;
 
     @observable
-    aura = 78;
+    username: string = "Fraktar";
 
     @observable
     phase = -34;
@@ -27,16 +29,22 @@ class User {
             }
         ]
     }
+
+    @observable
+    dummy: any = {};
 }
 
 class World {
     @observable
     entities = new ObservableMap<any>();
+
+    @observable
+    anyContent: any[] = [];
 }
 
 let events: any[] = [];
 
-@DeepObserver((change, type, path)  => {
+@DeepObserver((change, type, path) => {
     console.log({change, type, path});
     events.push({change, type, path})
 })
@@ -46,66 +54,171 @@ class Store {
     @observable world: World = new World();
 }
 
-const store = new Store();
+// For function tests
+
+const state = {
+    id: 0,
+    user: {
+        aura: 0,
+
+        username: "Fraktar",
+
+        phase: -34,
+        inventory: {
+            slots: [
+                {
+                    prefabId: "axe",
+                    quantity: 1,
+                },
+                {
+                    prefabId: "food",
+                    quantity: 43
+                }
+            ]
+        },
+        dummy: <any>{}
+    },
+    world: {
+        entities: new ObservableMap<any>(),
+        anyContent: []
+    }
+};
 
 should();
 
-describe('getObservableType', function() {
+describe('getObservableType', function () {
 
-    it('should be an observable array', function(){
+    const store = new Store();
+
+    it('should be an observable array', function () {
         getObservableType(observable([])).should.equals("array");
     });
-    it('should not be an observable array', function(){
+    it('should not be an observable array', function () {
         getObservableType([]).should.be.empty;
     });
-    it('should be an observable map', function() {
+    it('should be an observable map', function () {
         getObservableType(new ObservableMap()).should.equals("map");
     });
-    it('should not be an observable map', function() {
+    it('should not be an observable map', function () {
         getObservableType(new Map()).should.be.empty;
     });
-    it('should be an observable object', function() {
+    it('should be an observable object', function () {
         getObservableType(observable({})).should.equals("object");
     });
-    it('should not be an observable object', function() {
+    it('should not be an observable object', function () {
         getObservableType({}).should.be.empty;
     });
-    it('should be a computed property');
-    it('should not be a computed property');
-    it('should be a boxed observable');
-    it('should not be a boxed observable');
 });
 
-describe('DeepObserver decorator', function() {
+describe('DeepObserver decorator', function () {
 
-    describe('Test decorator', function() {
+    const store = new Store();
 
-        beforeEach(function(){
-            // reset events list
-            events = [];
-        });
+    beforeEach(function () {
+        // reset events list
+        events = [];
+    });
 
-        it('should have an observable id on root object', function(){
-            store.id = 1;
-            events.should.have.lengthOf(1);
-            events[0].change.name.should.equals("id");
-        });
+    it('should have an observable id on root object', function () {
+        store.id = 1;
+        events.should.have.lengthOf(1);
+        events[0].change.name.should.equals("id");
+    });
 
-        it('should register an "array" op at path "Store/user/inventory/slots/1"', function () {
-            store.user.inventory.slots.pop();
-            events.should.have.lengthOf(1);
-            events[0].type.should.equals("array");
-            events[0].path.should.equals("Store/user/inventory/slots/1");
+    it('should add an "array" op at path "Store/user/inventory/slots/1"', function () {
+        store.user.inventory.slots.pop();
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("array");
+        events[0].path.should.equals("Store/user/inventory/slots/1");
+    });
 
-        });
+    it('should add a "map" item at path "Store/world/entities/grunt0"', function () {
+        store.world.entities.set("grunt0", {type: "Orc"});
+        events.should.have.lengthOf(1);
+        console.log(events[0].type);
+        events[0].type.should.equals("map");
+        events[0].change.type.should.equals("add");
+        events[0].path.should.equals("Store/world/entities/grunt0");
+    });
 
-        it('should register a "map" op at path "Store/world/entities/grunt0"', function () {
-            store.world.entities.set("grunt0", {type: "Orc"});
-            events.should.have.lengthOf(1);
-            console.log(events[0].type);
-            events[0].type.should.equals("map");
-            events[0].path.should.equals("Store/world/entities/grunt0");
+    it('should update a map entry "Store/world/entities/grunt0"', function () {
+        store.world.entities.set("grunt0", {type: "Elf"});
+        events.should.have.lengthOf(1);
+        console.log(events[0].type);
+        events[0].change.type.should.equals("update");
+        events[0].path.should.equals("Store/world/entities/grunt0");
+    });
 
-        });
+    it('should add a map in an array"', function () {
+        store.world.anyContent.push(new ObservableMap<any>());
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("array");
+        events[0].path.should.equals("Store/world/anyContent/0");
+    });
+
+    it('should add an array in an map"', function () {
+        store.world.anyContent[0].set("foo", "bar");
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("map");
+        events[0].path.should.equals("Store/world/anyContent/0/foo");
+    });
+
+    it('should add an property on a weak object"', function () {
+        store.user.dummy.foo = "bar";
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("object");
+        events[0].path.should.equals("Store/user/dummy/foo");
+    });
+});
+
+describe('DeepObserver function', function () {
+
+    const store = observable(state);
+
+    deepObserve(store, (change, type, path) => {
+        console.log({change, type, path});
+        events.push({change, type, path})
+    }, "Store");
+
+    beforeEach(function () {
+        // reset events list
+        events = [];
+    });
+
+    it('should have an observable id on root object', function () {
+        store.id = 1;
+        events.should.have.lengthOf(1);
+        events[0].change.name.should.equals("id");
+    });
+
+    it('should add an "array" op at path "Store/user/inventory/slots/1"', function () {
+        store.user.inventory.slots.pop();
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("array");
+        events[0].path.should.equals("Store/user/inventory/slots/1");
+    });
+
+    it('should add a "map" item at path "Store/world/entities/grunt0"', function () {
+        store.world.entities.set("grunt0", {type: "Orc"});
+        events.should.have.lengthOf(1);
+        console.log(events[0].type);
+        events[0].type.should.equals("map");
+        events[0].change.type.should.equals("add");
+        events[0].path.should.equals("Store/world/entities/grunt0");
+    });
+
+    it('should update a map entry "Store/world/entities/grunt0"', function () {
+        store.world.entities.set("grunt0", {type: "Elf"});
+        events.should.have.lengthOf(1);
+        console.log(events[0].type);
+        events[0].change.type.should.equals("update");
+        events[0].path.should.equals("Store/world/entities/grunt0");
+    });
+
+    it('should add an property on a weak object"', function () {
+        store.user.dummy.foo = "bar";
+        events.should.have.lengthOf(1);
+        events[0].type.should.equals("object");
+        events[0].path.should.equals("Store/user/dummy/foo");
     });
 });

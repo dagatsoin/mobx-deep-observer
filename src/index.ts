@@ -202,6 +202,7 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
             object.forEach((obj: any, index: number) => _deepObserve(obj, listener, path + '/' + index, observerId));
             break;
         case "object":
+            console.log("IT IS AN OBJECT")
             observe(object, (change: IObjectChange) => {
                 switch (change.type) {
                     case "add":
