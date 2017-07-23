@@ -46,16 +46,16 @@ export function getObservableType(object: any): string {
  * @private
  */
 function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArraySplice<any> | IArrayChange<any> | IObjectChange | IValueDidChange<any>, type: string, path: string) => void, path: string = "", observerId: string): void {
-    console.log(path);
+    //console.log(path);
 
     // Guess the type of observable
     const observableType = getObservableType(object);
     // Not an observable key
     if (!observableType) {
-        console.log("NOT OBSERVABLE");
+        //console.log("NOT OBSERVABLE");
         return;
     }
-    console.log("Observable object", object, "of type", observableType);
+    //console.log("Observable object", object, "of type", observableType);
 
     // Already treated, detect circle dependencies in graphes
     const metadata = Reflect.getMetadata("deepObservers", object);
@@ -73,7 +73,7 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
     switch (observableType) {
         // It is a map
         case "map":
-            console.log("IT IS A MAP", object);
+            //console.log("IT IS A MAP", object);
             object.observe((change: IMapChange<any>) => {
                 switch (change.type) {
                     case "add":
@@ -83,7 +83,6 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
                         _deepObserve(change.newValue, listener, path + '/' + change.name, observerId);
                         // TODO: remove the observer of the old value
                         break;
-
                 }
                 listener(change as IMapChange<any>, observableType, getPath(object, observerId) + '/' + change.name);
             });
@@ -119,7 +118,7 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
             object.forEach((obj: any, index: number) => _deepObserve(obj, listener, path + '/' + index, observerId));
             break;
         case "object":
-            console.log("IT IS AN OBJECT")
+            //console.log("IT IS AN OBJECT")
             observe(object, (change: IObjectChange) => {
                 switch (change.type) {
                     case "add":
