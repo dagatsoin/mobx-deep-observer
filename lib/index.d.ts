@@ -1,7 +1,6 @@
 import { IValueDidChange } from "mobx";
 import "reflect-metadata";
 export declare function getObservableType(object: any): string;
-// noinspection JSUnusedGlobalSymbols
 /**
  * Wrapper to prevent the user to give an observer ID.
  * @param object
@@ -10,5 +9,4 @@ export declare function getObservableType(object: any): string;
  * @param {string} parentPath the path of the parent node
  */
 export declare function deepObserve<T>(object: any, listener: (change: IValueDidChange<T>, type: string, path: string) => void, parentPath?: string): void;
-// noinspection JSUnusedGlobalSymbols
 export declare function DeepObserver<T>(listener: (change: IValueDidChange<T>, type: string, path: string) => void): (target: any) => any;
