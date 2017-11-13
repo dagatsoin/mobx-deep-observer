@@ -1,6 +1,6 @@
 {
   "name": "mobx-deep-observer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A deep observer for MobX.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -34,9 +34,9 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.29",
     "chai": "^4.0.2",
+    "typescript": "^2.6.1",
     "mobx": "^3.1.14",
     "mocha": "^3.4.2",
-    "ts-node": "^3.0.6",
-    "typescript": "^2.3.4"
+    "ts-node": "^3.0.6"
   }
 }

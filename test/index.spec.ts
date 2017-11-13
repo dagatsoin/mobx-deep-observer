@@ -2,6 +2,7 @@ import {should, expect} from "chai";
 import {extendObservable, observable, ObservableMap} from "mobx";
 import "reflect-metadata";
 import {deepObserve, DeepObserver, getObservableType} from "../src/index";
+import {Operation, toJSONPatch} from "../src/JSONPatch";
 
 // Objects for decorator tests
 
@@ -168,12 +169,12 @@ describe("DeepObserver decorator", function () {
     });
 });
 
+
 describe("DeepObserver function", function () {
 
     const store = observable(state);
 
     deepObserve(store, (change, type, path) => {
-        console.log({change, type, path});
         events.push({change, type, path});
     }, "Store");
 
@@ -215,5 +216,41 @@ describe("DeepObserver function", function () {
     it("should not emit when adding a prop\"", function () {
         store.user.dummy.foo = "bar";
         events.should.have.lengthOf(0);
+    });
+});
+
+describe("JSON patch", function () {
+
+    const store = observable(state);
+    let operations: Array<Operation> = [];
+
+    deepObserve(store, (change: any, type: string, path: string) => {
+        operations.push(...toJSONPatch(change, type, path));
+        console.log(operations);
+    }, "Store");
+
+    it("should emit a patch", function () {
+        store.user.inventory.slots.pop();
+        store.world.entities.set("grunt0", {type: "Orc"});
+        store.world.entities.set("grunt0", {type: "Elf"});
+        operations.should.be.deep.equal([
+            {
+                op: "remove",
+                path: "Store/user/inventory/slots/1"
+            },
+            {
+                op: "add",
+                path: "Store/world/entities/grunt0",
+                value: {
+                    type: "Orc"
+                }
+            },
+            {
+                op: "replace",
+                path: "Store/world/entities/grunt0",
+                value: {
+                    type: "Elf"
+                }
+            }]);
     });
 });
