@@ -1,7 +1,30 @@
 # Mobx deep observer
 #### The mobx state tree of the poor man.
 
-React to change in a model tree (expect adding/removing key on a plain object)
+React to change in a model tree (expect adding/removing key on a plain object).
+
+By default, mobx.observabble tracks deeply. But observer, reaction or autorun tracks only what you access in the function. (https://github.com/mobxjs/mobx/issues/214)
+
+If you want to observe all mutations of a deep object you will have to access all its properties. Which is not easy to write.
+
+So I made a little abstraction over observer which works like this: 
+
+`deepObserver(BigDeepStore, console.log);`
+
+Internally the package use "reflect-metadata" to crawl the store tree and put an observer on each props. // Todo perf test.
+
+## Event object
+
+When a deep mutation is observed, the handler will receive the following event object:
+
+```
+{
+  change: ... // the mobx change object (the same as observer handler)
+  type: 'map', // the type
+  path: 'Store/world/entities/grunt0' // the path of the change 
+}
+
+``` 
 
 ## Example
 
@@ -65,9 +88,13 @@ console.log(events[0].change.type) // "add";
 console.log(events[0].path) // ("Store/world/entities/grunt0");
   
 ```
-## JSON patch
+
 ## Install
 // Not on npm yet
+
+## Run tests
+
+`npm run test`
 
 ## Todo:
 - write more tests
