@@ -1,8 +1,8 @@
 import {should, expect} from "chai";
 import {extendObservable, observable, ObservableMap} from "mobx";
 import "reflect-metadata";
-import {deepObserve, DeepObserver, getObservableType} from "../src/index";
-import {Operation, toJSONPatch} from "../src/JSONPatch";
+import {deepObserve, toJSONPatch, DeepObserver, getObservableType} from "../src/index";
+import {Operation} from "../src/JSONPatch";
 
 // Objects for decorator tests
 
@@ -227,7 +227,7 @@ describe("JSON patch", function () {
     deepObserve(store, (change: any, type: string, path: string) => {
         operations.push(...toJSONPatch(change, type, path));
         console.log(operations);
-    }, "Store");
+    }, "store");
 
     it("should emit a patch", function () {
         store.user.inventory.slots.pop();
@@ -236,18 +236,18 @@ describe("JSON patch", function () {
         operations.should.be.deep.equal([
             {
                 op: "remove",
-                path: "Store/user/inventory/slots/1"
+                path: "store/user/inventory/slots/1"
             },
             {
                 op: "add",
-                path: "Store/world/entities/grunt0",
+                path: "store/world/entities/grunt0",
                 value: {
                     type: "Orc"
                 }
             },
             {
                 op: "replace",
-                path: "Store/world/entities/grunt0",
+                path: "store/world/entities/grunt0",
                 value: {
                     type: "Elf"
                 }

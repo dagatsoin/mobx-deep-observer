@@ -7,11 +7,7 @@ By default, mobx.observabble tracks deeply. But observer, reaction or autorun tr
 
 If you want to observe all mutations of a deep object you will have to access all its properties. Which is not easy to write.
 
-So I made a little abstraction over observer which works like this: 
-
-`deepObserver(BigDeepStore, console.log);`
-
-Internally the package use "reflect-metadata" to crawl the store tree and put an observer on each props. // Todo perf test.
+So I made a little abstraction over observer. Internally the package use "reflect-metadata" to crawl the store tree and put an observer on each props. // Todo perf test.
 
 ## Event object
 
@@ -25,6 +21,14 @@ When a deep mutation is observed, the handler will receive the following event o
 }
 
 ``` 
+
+## Usage
+
+`deepObserver(observableObject, handler, rootName?);`
+
+- object: an obbservable object
+- (change: IValueDidChange<T>, path: string) => void} listener A listener which takes a change object at first argument and the path of the node at second argument
+- rootName: optional. The name of the root if you want to change it.
 
 ## Example
 
@@ -89,8 +93,23 @@ console.log(events[0].path) // ("Store/world/entities/grunt0");
   
 ```
 
+## JSON patch
+
+A cool feature of mobx state tree is JSON patch. Each mutation emit a patch.
+
+```
+import {JSONPatch} from "mobx-deep-observer"
+
+deepObserve(store, (change: any, type: string, path: string) => {
+    console.log(...toJSONPatch(change, type, path));
+}, "Store");
+
+```
+
+
 ## Install
-// Not on npm yet
+
+`npm i mobx-deep-observer`
 
 ## Run tests
 

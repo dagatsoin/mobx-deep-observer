@@ -4,6 +4,8 @@ import {
 import "reflect-metadata";
 import {IDeepObserverMetadata} from "./IDeepObserverMetaData";
 
+export { toJSONPatch } from "./JSONPatch";
+
 // TODO jsonPatch: extract jsonPatch functionnality into an observer listener (in a separate project)
 // TODO deepObserver: writes specs as tests
 // TODO jsonPatch: ensure that all value are serializable (avoid class instance)
@@ -142,11 +144,11 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
  * at second argument
  * @param {string} parentPath the path of the parent node
  */
-export function deepObserve<T>(object: any, listener: (change: IValueDidChange<T>, type: string, path: string) => void, parentPath = "") {
+export function deepObserve<T>(object: any, listener: (change: IValueDidChange<T>, type: string, path?: string) => void, parentPath = "") {
     _deepObserve(object, listener, parentPath, "deepObserver@" + Math.ceil(Math.random() * 10000));
 }
 
-export function DeepObserver<T>(listener: (change: IValueDidChange<T>, type: string, path: string) => void) {
+export function DeepObserver<T>(listener: (change: IValueDidChange<T>, type: string, path?: string) => void) {
     return function (target: any) {
 
         const newConstructor = function (this: any, ...args: any[]) {
