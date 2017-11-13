@@ -31,8 +31,8 @@ function getPath(object: any, observerId: string, key?: string): string {
 
 export function getObservableType(object: any): string {
     if (typeof object !== "object" || !object || !object.constructor) return "";
-    if (object.constructor.name == "ObservableMap") return isObservableMap(object) ? "map" : "";
-    else if (object.constructor.name == "ObservableArray")  return isObservableArray(object) ? "array" : "";
+    if (object.constructor.name === "ObservableMap") return isObservableMap(object) ? "map" : "";
+    else if (object.constructor.name === "ObservableArray")  return isObservableArray(object) ? "array" : "";
     else return isObservableObject(object) ? "object" : "";
 }
 
@@ -46,16 +46,16 @@ export function getObservableType(object: any): string {
  * @private
  */
 function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArraySplice<any> | IArrayChange<any> | IObjectChange | IValueDidChange<any>, type: string, path: string) => void, path: string = "", observerId: string): void {
-    //console.log(path);
+    // console.log(path);
 
     // Guess the type of observable
     const observableType = getObservableType(object);
     // Not an observable key
     if (!observableType) {
-        //console.log("NOT OBSERVABLE");
+        // console.log("NOT OBSERVABLE");
         return;
     }
-    //console.log("Observable object", object, "of type", observableType);
+    // console.log("Observable object", object, "of type", observableType);
 
     // Already treated, detect circle dependencies in graphes
     const metadata = Reflect.getMetadata("deepObservers", object);
@@ -63,7 +63,7 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
 
     // Set observers recursively
 
-    //Add the observer ID and the path of the current property from the root.
+    // Add the observer ID and the path of the current property from the root.
     // This means that the same object could be used in different graph or/and with different observers.
     const obsMetaData = {observerId, path};
 
@@ -73,21 +73,21 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
     switch (observableType) {
         // It is a map
         case "map":
-            //console.log("IT IS A MAP", object);
+            // console.log("IT IS A MAP", object);
             object.observe((change: IMapChange<any>) => {
                 switch (change.type) {
                     case "add":
-                        _deepObserve(change.newValue, listener, path + '/' + change.name, observerId);
+                        _deepObserve(change.newValue, listener, path + "/" + change.name, observerId);
                         break;
                     case "update":
-                        _deepObserve(change.newValue, listener, path + '/' + change.name, observerId);
+                        _deepObserve(change.newValue, listener, path + "/" + change.name, observerId);
                         // TODO: remove the observer of the old value
                         break;
                 }
-                listener(change as IMapChange<any>, observableType, getPath(object, observerId) + '/' + change.name);
+                listener(change as IMapChange<any>, observableType, getPath(object, observerId) + "/" + change.name);
             });
             // Treat current keys
-            object.forEach((value: any, key: string) => _deepObserve(value, listener, path + '/' + key, observerId));
+            object.forEach((value: any, key: string) => _deepObserve(value, listener, path + "/" + key, observerId));
             break;
         // It is an array
         case "array":
@@ -96,41 +96,41 @@ function _deepObserve<T>(object: any, listener: (change: IMapChange<any> | IArra
                     case "splice":
                         if (change.addedCount) {
                             change.added.forEach((value, index) => {
-                                _deepObserve(value, listener, path + '/' + (change.index + index), observerId);
-                                listener(change as IArraySplice<any>, observableType, getPath(object, observerId) + '/' + (change.index + index));
-                            })
+                                _deepObserve(value, listener, path + "/" + (change.index + index), observerId);
+                                listener(change as IArraySplice<any>, observableType, getPath(object, observerId) + "/" + (change.index + index));
+                            });
                         } else if (change.removedCount) {
                             // TODO: remove the observer of the old value
                             change.removed.forEach((value, index) => {
-                                listener(change as IArraySplice<any>, observableType, getPath(object, observerId) + '/' + (change.index + index));
+                                listener(change as IArraySplice<any>, observableType, getPath(object, observerId) + "/" + (change.index + index));
                             });
                         }
                         break;
                     case "update":
                         // TODO: remove the observer of the old value
-                        _deepObserve(change.newValue, listener, path + '/' + change.index, observerId);
-                        listener(change as IArrayChange<any>, observableType, getPath(object, observerId) + '/' + change.index);
+                        _deepObserve(change.newValue, listener, path + "/" + change.index, observerId);
+                        listener(change as IArrayChange<any>, observableType, getPath(object, observerId) + "/" + change.index);
                         break;
 
                 }
             });
             // Treat current keys
-            object.forEach((obj: any, index: number) => _deepObserve(obj, listener, path + '/' + index, observerId));
+            object.forEach((obj: any, index: number) => _deepObserve(obj, listener, path + "/" + index, observerId));
             break;
         case "object":
-            //console.log("IT IS AN OBJECT")
+            // console.log("IT IS AN OBJECT")
             observe(object, (change: IObjectChange) => {
                 switch (change.type) {
                     case "add":
-                        listener(change, "object", getPath(object, observerId) + '/' + change.name);
+                        listener(change, "object", getPath(object, observerId) + "/" + change.name);
                         break;
                     case "update":
-                        listener(change, "object", getPath(object, observerId) + '/' + change.name);
+                        listener(change, "object", getPath(object, observerId) + "/" + change.name);
                 }
-                _deepObserve(change.newValue, listener, path + '/' + change.name, observerId);
+                _deepObserve(change.newValue, listener, path + "/" + change.name, observerId);
             });
             // Treat current keys
-            Object.keys(object).forEach(key => _deepObserve(object[key], listener, path + '/' + key, observerId));
+            Object.keys(object).forEach(key => _deepObserve(object[key], listener, path + "/" + key, observerId));
 
     }
 }
@@ -151,18 +151,11 @@ export function DeepObserver<T>(listener: (change: IValueDidChange<T>, type: str
 
         const newConstructor = function (this: any, ...args: any[]) {
             target.apply(this, args);
-            deepObserve(this, listener, target.name)
+            deepObserve(this, listener, target.name);
         };
 
         newConstructor.prototype = Object.create(target.prototype);
         newConstructor.prototype.constructor = target;
         return <any>newConstructor;
-    }
-}
-
-function classDecorator<T extends { new(...args: any[]): {} }>(constructor: T) {
-    return class extends constructor {
-        newProperty = "new property";
-        hello = "override";
-    }
+    };
 }
