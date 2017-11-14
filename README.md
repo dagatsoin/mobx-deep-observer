@@ -1,4 +1,7 @@
-# Mobx deep observer
+#Alpha version! Not for prod use.
+
+## Mobx deep observer 
+
 #### The mobx state tree of the poor man.
 
 React to change in a model tree (expect adding/removing key on a plain object).

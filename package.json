@@ -1,6 +1,6 @@
 {
   "name": "mobx-deep-observer",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "A deep observer for MobX.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
