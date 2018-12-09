@@ -1,4 +1,4 @@
-#Alpha version! Not for prod use.
+NOT MAINTENED ANYMORE. MOBX NOW HAS A DEEP OBSERVER BUILT IN.
 
 ## Mobx deep observer 
 
