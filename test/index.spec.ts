@@ -1,4 +1,4 @@
-import {should, expect} from "chai";
+import {should} from "chai";
 import {extendObservable, observable, ObservableMap} from "mobx";
 import "reflect-metadata";
 import {deepObserve, toJSONPatch, DeepObserver, getObservableType} from "../src/index";
@@ -54,36 +54,6 @@ class Store {
     @observable user: User = new User();
     @observable world: World = new World();
 }
-
-// For function tests
-
-const state = {
-    id: 0,
-    user: {
-        aura: 0,
-
-        username: "Fraktar",
-
-        phase: -34,
-        inventory: {
-            slots: [
-                {
-                    prefabId: "axe",
-                    quantity: 1,
-                },
-                {
-                    prefabId: "food",
-                    quantity: 43
-                }
-            ]
-        },
-        dummy: <any>{}
-    },
-    world: {
-        entities: new ObservableMap<any>(),
-        anyContent: []
-    }
-};
 
 should();
 
@@ -172,7 +142,31 @@ describe("DeepObserver decorator", function () {
 
 describe("DeepObserver function", function () {
 
-    const store = observable(state);
+    const store = observable({
+        id: 0,
+        user: {
+            aura: 0,
+            username: "Fraktar",
+            phase: -34,
+            inventory: {
+                slots: [
+                    {
+                        prefabId: "axe",
+                        quantity: 1,
+                    },
+                    {
+                        prefabId: "food",
+                        quantity: 43
+                    }
+                ]
+            },
+            dummy: <any>{}
+        },
+        world: {
+            entities: new ObservableMap<any>(),
+            anyContent: []
+        }
+    });
 
     deepObserve(store, (change, type, path) => {
         events.push({change, type, path});
@@ -221,12 +215,36 @@ describe("DeepObserver function", function () {
 
 describe("JSON patch", function () {
 
-    const store = observable(state);
+    const store = observable({
+        id: 0,
+        user: {
+            aura: 0,
+            username: "Fraktar",
+            phase: -34,
+            inventory: {
+                slots: [
+                    {
+                        prefabId: "axe",
+                        quantity: 1,
+                    },
+                    {
+                        prefabId: "food",
+                        quantity: 43
+                    }
+                ]
+            },
+            dummy: <any>{}
+        },
+        world: {
+            entities: new ObservableMap<any>(),
+            anyContent: []
+        }
+    });
     let operations: Array<Operation> = [];
 
     deepObserve(store, (change: any, type: string, path: string) => {
         operations.push(...toJSONPatch(change, type, path));
-        console.log(operations);
+        console.log("test", operations.length);
     }, "store");
 
     it("should emit a patch", function () {
@@ -251,6 +269,7 @@ describe("JSON patch", function () {
                 value: {
                     type: "Elf"
                 }
-            }]);
+            },
+        ]);
     });
 });
